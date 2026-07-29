@@ -1,0 +1,8 @@
+{
+  "name": "Júlia Furtado - Portfolio & Design Management",
+  "description": "Portfolio e Gerenciador de Conteúdo Editorial para Designers e Criativos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
