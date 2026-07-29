@@ -8,6 +8,7 @@ import { ProjectDetailView } from './components/ProjectDetailView';
 import { AboutView } from './components/AboutView';
 import { ContactView } from './components/ContactView';
 import { AdminView } from './components/AdminView';
+import { AdminLoginModal } from './components/AdminLoginModal';
 import { DirectImageLinksModal } from './components/DirectImageLinksModal';
 import { ProjectModal } from './components/ProjectModal';
 import { ManifestoModal } from './components/ManifestoModal';
@@ -15,6 +16,15 @@ import { ManifestoModal } from './components/ManifestoModal';
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'about' | 'contact' | 'admin'>('home');
   const [selectedProjectSlug, setSelectedProjectSlug] = useState<string | null>(null);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('julia_furtado_admin_authenticated_v1') || 'false');
+    } catch {
+      return false;
+    }
+  });
+  const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
+  const [adminLoginError, setAdminLoginError] = useState<string | null>(null);
 
   // Initialize projects state with local storage fallback
   const [projects, setProjects] = useState<Project[]>(() => {
@@ -38,6 +48,8 @@ export default function App() {
   const [isManifestoModalOpen, setIsManifestoModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
+  const ADMIN_ACCESS_PASSWORD = 'minha-senha-secreta';
+
   // Persist projects to localStorage
   useEffect(() => {
     try {
@@ -46,6 +58,14 @@ export default function App() {
       console.warn('Failed to save projects to localStorage:', err);
     }
   }, [projects]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('julia_furtado_admin_authenticated_v1', JSON.stringify(isAdminAuthenticated));
+    } catch (err) {
+      console.warn('Failed to save admin auth state:', err);
+    }
+  }, [isAdminAuthenticated]);
 
   // Selected project calculation
   const selectedProject = projects.find(p => p.slug === selectedProjectSlug);
@@ -123,13 +143,40 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleTabChange = (tab: 'home' | 'about' | 'contact' | 'admin') => {
+    setSelectedProjectSlug(null);
+    if (tab === 'admin') {
+      if (isAdminAuthenticated) {
+        setActiveTab('admin');
+      } else {
+        setAdminLoginError(null);
+        setIsAdminLoginOpen(true);
+      }
+      return;
+    }
+    setActiveTab(tab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleAdminLoginSubmit = (password: string) => {
+    if (password === ADMIN_ACCESS_PASSWORD) {
+      setIsAdminAuthenticated(true);
+      setAdminLoginError(null);
+      setIsAdminLoginOpen(false);
+      setActiveTab('admin');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      setAdminLoginError('Senha incorreta. Tente novamente.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FAF7F2] text-stone-900 font-sans selection:bg-purple-200 selection:text-purple-950 flex flex-col justify-between">
       
       {/* Top Header Navigation */}
       <Header
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        onNavClick={handleTabChange}
         onOpenImageLinksModal={() => setIsImageLinksModalOpen(true)}
         selectedProjectSlug={selectedProjectSlug}
         onClearSelectedProject={() => setSelectedProjectSlug(null)}
@@ -191,11 +238,7 @@ export default function App() {
 
       {/* Footer */}
       <Footer
-        onNavClick={(tab) => {
-          setSelectedProjectSlug(null);
-          setActiveTab(tab);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        onNavClick={handleTabChange}
         onOpenImageLinksModal={() => setIsImageLinksModalOpen(true)}
       />
 
@@ -213,6 +256,13 @@ export default function App() {
         }}
         onSave={handleSaveProject}
         editingProject={editingProject}
+      />
+
+      <AdminLoginModal
+        isOpen={isAdminLoginOpen}
+        onClose={() => setIsAdminLoginOpen(false)}
+        onSubmit={handleAdminLoginSubmit}
+        error={adminLoginError}
       />
 
       <ManifestoModal
