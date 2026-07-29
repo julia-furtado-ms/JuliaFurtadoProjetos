@@ -3,7 +3,7 @@ import { Sparkles, Briefcase, Mail, Settings } from 'lucide-react';
 
 interface HeaderProps {
   activeTab: 'home' | 'about' | 'contact' | 'admin';
-  setActiveTab: (tab: 'home' | 'about' | 'contact' | 'admin') => void;
+  onNavClick: (tab: 'home' | 'about' | 'contact' | 'admin') => void;
   onOpenImageLinksModal: () => void;
   selectedProjectSlug: string | null;
   onClearSelectedProject: () => void;
@@ -11,14 +11,14 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   activeTab,
-  setActiveTab,
+  onNavClick,
   onOpenImageLinksModal,
   selectedProjectSlug,
   onClearSelectedProject,
 }) => {
   const handleNavClick = (tab: 'home' | 'about' | 'contact' | 'admin') => {
     onClearSelectedProject();
-    setActiveTab(tab);
+    onNavClick(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
