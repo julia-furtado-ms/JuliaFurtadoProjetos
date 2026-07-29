@@ -68,7 +68,7 @@ export default function App() {
   }, [isAdminAuthenticated]);
 
   // Selected project calculation
-  const selectedProject = projects.find(p => p.slug === selectedProjectSlug);
+  const selectedProject = projects.find((p: { slug: any; }) => p.slug === selectedProjectSlug);
 
   // CRUD Actions
   const handleSaveProject = (projectData: Partial<Project>) => {
