@@ -84,7 +84,7 @@ export const ContactView: React.FC = () => {
             <h4 className="text-xs small-caps text-purple-950 uppercase tracking-widest font-semibold">Redes Profissionais</h4>
             <div className="space-y-3 text-sm font-light">
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/julia-furtado-ms/"
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center justify-between p-3 rounded-xl bg-[#FAF7F2] hover:bg-purple-50/60 border border-stone-200 text-stone-800 transition-colors group"
@@ -115,8 +115,8 @@ export const ContactView: React.FC = () => {
           <div className="rounded-2xl overflow-hidden bg-white border border-purple-100/80 shadow-sm space-y-3 p-4">
             <div className="aspect-video rounded-xl overflow-hidden relative border border-stone-200">
               <img
-                src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200"
-                alt="Recife Geometria Urbana"
+                src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Recife_-_Vista_a%C3%A9rea_a_partir_do_bairro_do_Recife.jpg"
+                alt="Recife Antigo"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-stone-950/20" />

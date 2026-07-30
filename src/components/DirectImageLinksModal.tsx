@@ -132,7 +132,7 @@ export const DirectImageLinksModal: React.FC<DirectImageLinksModalProps> = ({ is
                 required
                 value={newUrl}
                 onChange={(e) => setNewUrl(e.target.value)}
-                placeholder="https://images.unsplash.com/photo-..."
+                placeholder="Imagem Aqui"
                 className="w-full px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-900 text-xs focus:outline-none focus:border-purple-600"
               />
             </div>

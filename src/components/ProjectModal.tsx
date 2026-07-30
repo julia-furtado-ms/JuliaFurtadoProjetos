@@ -174,7 +174,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
               required
               value={formData.coverImage}
               onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-              placeholder="https://images.unsplash.com/photo-..."
+              placeholder="Link para Imagem de Capa"
               className="w-full px-3.5 py-2.5 rounded-lg bg-[#FAF7F2] border border-stone-200 text-stone-900 focus:outline-none focus:border-purple-600 font-sans"
             />
           </div>
@@ -202,7 +202,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
                     type="url"
                     value={url}
                     onChange={(e) => setGalleryInputs(prev => prev.map((item, idx) => idx === index ? e.target.value : item))}
-                    placeholder="https://images.unsplash.com/photo-..."
+                    placeholder="link da imagem"
                     className="flex-1 px-3.5 py-2.5 rounded-lg bg-[#FAF7F2] border border-stone-200 text-stone-900 focus:outline-none focus:border-purple-600 font-sans"
                   />
                   <button
