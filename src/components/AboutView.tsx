@@ -9,10 +9,10 @@ interface AboutViewProps {
 
 export const AboutView: React.FC<AboutViewProps> = ({ onContactClick, onOpenImageLinksModal }) => {
   const [copiedPortrait, setCopiedPortrait] = useState(false);
-  const portraitUrl = 'https://drive.google.com/file/d/1S-N9MfR7XTLBf7Ud_KNHzpzjoUQcoD_F/view';
+  const portraitUrl = '/portrait.jpg';
 
   const handleCopyPortrait = () => {
-    navigator.clipboard.writeText(portraitUrl);
+    navigator.clipboard.writeText(window.location.origin + portraitUrl);
     setCopiedPortrait(true);
     setTimeout(() => setCopiedPortrait(false), 2000);
   };
