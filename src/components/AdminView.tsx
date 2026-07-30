@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Project, PostStatus, ProjectCategory } from '../types';
+import { normalizeImageUrl } from '../utils/normalizeImageUrl';
 import { Plus, Search, Filter, Edit, Trash2, Eye, ToggleLeft, ToggleRight, Copy, Check, Sparkles, RefreshCw, Layers, FileText } from 'lucide-react';
 
 interface AdminViewProps {
@@ -163,7 +164,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                 <div className="flex items-center gap-4">
                   <div className="w-20 h-14 rounded-xl overflow-hidden bg-stone-100 shrink-0 border border-stone-200">
                     <img
-                      src={project.coverImage}
+                      src={normalizeImageUrl(project.coverImage)}
                       alt={project.title}
                       className="w-full h-full object-cover"
                     />

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { SKILL_ITEMS } from '../data/mockProjects';
+import { normalizeImageUrl } from '../utils/normalizeImageUrl';
 import { ArrowRight, MapPin, Award, BookOpen, Layers, Copy, Check, Sparkles, Cpu, Code, Palette, Search } from 'lucide-react';
 
 interface AboutViewProps {
@@ -9,7 +10,7 @@ interface AboutViewProps {
 
 export const AboutView: React.FC<AboutViewProps> = ({ onContactClick, onOpenImageLinksModal }) => {
   const [copiedPortrait, setCopiedPortrait] = useState(false);
-  const portraitUrl = 'https://drive.google.com/uc?export=view&id=1S-N9MfR7XTLBf7Ud_KNHzpzjoUQcoD_F';
+  const portraitUrl = normalizeImageUrl('https://drive.google.com/file/d/1S-N9MfR7XTLBf7Ud_KNHzpzjoUQcoD_F/view?usp=drive_link');
 
   const handleCopyPortrait = () => {
     navigator.clipboard.writeText(window.location.origin + portraitUrl);

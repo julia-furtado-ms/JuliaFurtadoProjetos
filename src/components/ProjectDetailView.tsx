@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Project } from '../types';
+import { normalizeImageUrl } from '../utils/normalizeImageUrl';
 import { ArrowLeft, ExternalLink, Calendar, User, Wrench, Building, Copy, Check, Eye, Share2, Image, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProjectDetailViewProps {
@@ -120,7 +121,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
       <div className="space-y-3">
         <div className="relative rounded-2xl overflow-hidden bg-stone-200 border border-stone-300 aspect-video group shadow-xl">
           <img
-            src={project.coverImage}
+            src={normalizeImageUrl(project.coverImage)}
             alt={project.title}
             className="w-full h-full object-cover"
           />
@@ -179,7 +180,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
           <div className="space-y-6">
             <div className="relative rounded-3xl overflow-hidden bg-stone-200 aspect-video shadow-xl">
               <img
-                src={project.galleryImages[activeGalleryIndex]}
+                src={normalizeImageUrl(project.galleryImages[activeGalleryIndex])}
                 alt={`${project.title} - Visual ${activeGalleryIndex + 1}`}
                 className="w-full h-full object-cover"
               />
@@ -212,7 +213,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                   className={`flex-shrink-0 rounded-2xl overflow-hidden border transition ${activeGalleryIndex === idx ? 'border-purple-950 shadow-lg' : 'border-stone-200 hover:border-purple-300'}`}
                 >
                   <img
-                    src={imgUrl}
+                    src={normalizeImageUrl(imgUrl)}
                     alt={`Thumbnail ${idx + 1}`}
                     className="w-28 h-20 object-cover"
                   />
@@ -253,7 +254,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
               className="group bg-white hover:border-purple-300 border border-purple-100/80 shadow-sm rounded-xl p-4 cursor-pointer transition-all space-y-3"
             >
               <div className="aspect-video rounded-lg overflow-hidden bg-stone-100">
-                <img src={p.coverImage} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                <img src={normalizeImageUrl(p.coverImage)} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
               </div>
               <div>
                 <div className="text-xs small-caps text-purple-950 font-semibold">{p.category}</div>

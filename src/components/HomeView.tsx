@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Project, ProjectCategory } from '../types';
+import { normalizeImageUrl } from '../utils/normalizeImageUrl';
 import { ArrowRight, Sparkles, Eye, Filter, Copy, Check, ExternalLink, Image } from 'lucide-react';
 
 interface HomeViewProps {
@@ -118,7 +119,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 {/* Image Container with Direct Link Overlay */}
                 <div className="relative aspect-video overflow-hidden bg-stone-100">
                   <img
-                    src={project.coverImage}
+                    src={normalizeImageUrl(project.coverImage)}
                     alt={project.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"

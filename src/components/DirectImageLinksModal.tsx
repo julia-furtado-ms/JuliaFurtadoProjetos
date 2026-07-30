@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DirectImageLink } from '../types';
 import { DIRECT_IMAGE_LINKS } from '../data/mockProjects';
+import { normalizeImageUrl } from '../utils/normalizeImageUrl';
 import { X, Copy, Check, ExternalLink, Image, Sparkles, Plus } from 'lucide-react';
 
 interface DirectImageLinksModalProps {
@@ -161,7 +162,7 @@ export const DirectImageLinksModal: React.FC<DirectImageLinksModalProps> = ({ is
               
               <div className="flex items-center gap-4">
                 <div className="w-16 h-12 rounded-lg overflow-hidden bg-stone-100 border border-stone-200 shrink-0">
-                  <img src={item.url} alt={item.title} className="w-full h-full object-cover" />
+                  <img src={normalizeImageUrl(item.url)} alt={item.title} className="w-full h-full object-cover" />
                 </div>
 
                 <div className="space-y-0.5">
