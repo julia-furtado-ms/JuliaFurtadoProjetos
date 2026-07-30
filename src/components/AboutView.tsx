@@ -9,7 +9,7 @@ interface AboutViewProps {
 
 export const AboutView: React.FC<AboutViewProps> = ({ onContactClick, onOpenImageLinksModal }) => {
   const [copiedPortrait, setCopiedPortrait] = useState(false);
-  const portraitUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=1000';
+  const portraitUrl = 'https://drive.google.com/file/d/1S-N9MfR7XTLBf7Ud_KNHzpzjoUQcoD_F/view';
 
   const handleCopyPortrait = () => {
     navigator.clipboard.writeText(portraitUrl);
@@ -62,13 +62,13 @@ export const AboutView: React.FC<AboutViewProps> = ({ onContactClick, onOpenImag
 
           <div className="space-y-4 text-stone-700 text-base leading-relaxed font-sans font-light">
             <p>
-              Olá! Sou Júlia Furtado, Designer de Produto e UX/UI baseada no Recife. Atuo na interseção entre estratégia de negócios, pesquisa com usuários e sistemas de interface de alta precisão.
+              Olá! Sou Júlia Furtado, Designer em formação no Recife. Atuo em diversas áreas do Design, portando uma visão estratégica refinada pela minha graduação em Adminsitração na UPE.
             </p>
             <p>
-              Com formação multidisciplinar conectando o ecossistema de inovação da CESAR School e pós-graduação em Design de Interação pela PUCRS, desenvolvi uma visão rigorosa sobre a criação de softwares que reduzem o atrito no cotidiano das pessoas.
+              Multidisciplinaridade é, para mim, mais do que uma vantagem, é uma necessidade. Por isso busco sempre por conhecimento e não paro.
             </p>
             <p>
-              Minha prática combina a precisão dos sistemas de tokens de design com a agilidade do protótipo funcional acelerado por Vibe Coding e ferramentas de IA generativa.
+              Neste site, que eu fiz com auxilio de IA estarei expondo meus projetos e a intenção por trás de cada um deles.
             </p>
           </div>
 
