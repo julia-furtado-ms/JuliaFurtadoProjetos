@@ -31,12 +31,16 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
 
   const [tagsInput, setTagsInput] = useState('');
   const [toolsInput, setToolsInput] = useState('');
+  const [galleryInputs, setGalleryInputs] = useState<string[]>(['https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200']);
+  const [galleryLinkInput, setGalleryLinkInput] = useState('');
 
   useEffect(() => {
     if (editingProject) {
       setFormData(editingProject);
       setTagsInput(editingProject.tags.join(', '));
       setToolsInput(editingProject.tools.join(', '));
+      setGalleryInputs(editingProject.galleryImages?.length ? editingProject.galleryImages : [editingProject.coverImage || '']);
+      setGalleryLinkInput(editingProject.galleryLink || '');
     } else {
       setFormData({
         title: '',
@@ -53,6 +57,8 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
       });
       setTagsInput('UI/UX Design, Mobile');
       setToolsInput('Figma, Design System');
+      setGalleryInputs(['https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200']);
+      setGalleryLinkInput('');
     }
   }, [editingProject, isOpen]);
 
@@ -64,12 +70,15 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
 
     const parsedTags = tagsInput.split(',').map(t => t.trim()).filter(Boolean);
     const parsedTools = toolsInput.split(',').map(t => t.trim()).filter(Boolean);
+    const parsedGalleryImages = galleryInputs.map(img => img.trim()).filter(Boolean);
 
     onSave({
       ...formData,
       tags: parsedTags,
       tools: parsedTools,
-      slug: formData.slug || formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+      galleryImages: parsedGalleryImages.length ? parsedGalleryImages : [formData.coverImage],
+      galleryLink: galleryLinkInput.trim() || undefined,
+      slug: formData.slug || formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
     });
 
     onClose();
@@ -168,6 +177,57 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
               placeholder="https://images.unsplash.com/photo-..."
               className="w-full px-3.5 py-2.5 rounded-lg bg-[#FAF7F2] border border-stone-200 text-stone-900 focus:outline-none focus:border-purple-600 font-sans"
             />
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <label className="small-caps text-purple-950 font-semibold">Links de imagens do post</label>
+                <p className="text-stone-500 text-xs">Adicione várias URLs para criar uma galeria/carrossel dentro do post.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setGalleryInputs(prev => [...prev, ''])}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-950 text-white text-xs uppercase tracking-wider font-semibold hover:bg-purple-900 transition-all"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Adicionar imagem</span>
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {galleryInputs.map((url, index) => (
+                <div key={index} className="flex gap-2">
+                  <input
+                    type="url"
+                    value={url}
+                    onChange={(e) => setGalleryInputs(prev => prev.map((item, idx) => idx === index ? e.target.value : item))}
+                    placeholder="https://images.unsplash.com/photo-..."
+                    className="flex-1 px-3.5 py-2.5 rounded-lg bg-[#FAF7F2] border border-stone-200 text-stone-900 focus:outline-none focus:border-purple-600 font-sans"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setGalleryInputs(prev => prev.filter((_, idx) => idx !== index))}
+                    className="px-3 py-2 rounded-lg bg-white border border-stone-200 text-stone-600 hover:text-rose-700 hover:border-rose-200 transition-colors"
+                    aria-label={`Remover imagem ${index + 1}`}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="small-caps text-purple-950 font-semibold">Link para carrossel externo / PDF</label>
+            <input
+              type="url"
+              value={galleryLinkInput}
+              onChange={(e) => setGalleryLinkInput(e.target.value)}
+              placeholder="https://..."
+              className="w-full px-3.5 py-2.5 rounded-lg bg-[#FAF7F2] border border-stone-200 text-stone-900 focus:outline-none focus:border-purple-600 font-sans"
+            />
+            <p className="text-stone-500 text-xs">Opcional: use um link externo para apresentar várias imagens ou um arquivo PDF semelhante a um carrossel.</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

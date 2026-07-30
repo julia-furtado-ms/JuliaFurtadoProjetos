@@ -90,9 +90,10 @@ export default function App() {
         role: projectData.role || 'Designer',
         tools: projectData.tools || ['Figma'],
         coverImage: projectData.coverImage || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200',
-        galleryImages: [
-          projectData.coverImage || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200'
-        ],
+        galleryImages: projectData.galleryImages && projectData.galleryImages.length > 0
+          ? projectData.galleryImages
+          : [projectData.coverImage || 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200'],
+        galleryLink: projectData.galleryLink,
         status: projectData.status || 'Publicado',
         views: 100,
         publishedAt: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })

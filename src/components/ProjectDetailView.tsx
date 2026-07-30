@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Project } from '../types';
-import { ArrowLeft, ExternalLink, Calendar, User, Wrench, Building, Copy, Check, Eye, Share2, Image } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Calendar, User, Wrench, Building, Copy, Check, Eye, Share2, Image, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProjectDetailViewProps {
   project: Project;
@@ -19,6 +19,11 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
 }) => {
   const [copiedCover, setCopiedCover] = useState(false);
   const [copiedGalleryIndex, setCopiedGalleryIndex] = useState<number | null>(null);
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
+
+  useEffect(() => {
+    setActiveGalleryIndex(0);
+  }, [project.id]);
 
   const otherProjects = allProjects.filter(p => p.id !== project.id && p.status === 'Publicado').slice(0, 3);
 
@@ -168,36 +173,70 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
         <div className="space-y-6 border-t border-stone-200/80 pt-10">
           <div className="flex items-center justify-between">
             <h3 className="text-2xl font-serif text-stone-900 font-medium">Galeria Visual & Interfaces</h3>
-            <span className="text-xs font-mono text-stone-500">{project.galleryImages.length} mockups</span>
+            <span className="text-xs font-mono text-stone-500">{project.galleryImages.length} {project.galleryImages.length === 1 ? 'imagem' : 'imagens'}</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {project.galleryImages.map((imgUrl, idx) => (
-              <div key={idx} className="relative group rounded-2xl overflow-hidden bg-stone-200 border border-stone-300 aspect-video shadow-lg">
-                <img
-                  src={imgUrl}
-                  alt={`${project.title} - Interface ${idx + 1}`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                
+          <div className="space-y-6">
+            <div className="relative rounded-3xl overflow-hidden bg-stone-200 aspect-video shadow-xl">
+              <img
+                src={project.galleryImages[activeGalleryIndex]}
+                alt={`${project.title} - Visual ${activeGalleryIndex + 1}`}
+                className="w-full h-full object-cover"
+              />
+
+              {project.galleryImages.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setActiveGalleryIndex((prev) => (prev === 0 ? project.galleryImages.length - 1 : prev - 1))}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/80 text-stone-700 hover:bg-white border border-stone-200 transition"
+                    aria-label="Mostrar imagem anterior"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setActiveGalleryIndex((prev) => (prev === project.galleryImages.length - 1 ? 0 : prev + 1))}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/80 text-stone-700 hover:bg-white border border-stone-200 transition"
+                    aria-label="Mostrar próxima imagem"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3 overflow-x-auto pb-2">
+              {project.galleryImages.map((imgUrl, idx) => (
                 <button
-                  onClick={() => handleCopyGalleryLink(imgUrl, idx)}
-                  className="absolute bottom-3 right-3 p-2.5 rounded-lg bg-white/90 hover:bg-white text-stone-800 hover:text-purple-950 transition-all backdrop-blur-md border border-stone-200 text-xs flex items-center gap-1.5 shadow-sm font-medium"
+                  key={idx}
+                  onClick={() => setActiveGalleryIndex(idx)}
+                  className={`flex-shrink-0 rounded-2xl overflow-hidden border transition ${activeGalleryIndex === idx ? 'border-purple-950 shadow-lg' : 'border-stone-200 hover:border-purple-300'}`}
                 >
-                  {copiedGalleryIndex === idx ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-purple-700" />
-                      <span className="small-caps">Copiado!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5 text-stone-600" />
-                      <span className="small-caps">Copiar Link</span>
-                    </>
-                  )}
+                  <img
+                    src={imgUrl}
+                    alt={`Thumbnail ${idx + 1}`}
+                    className="w-28 h-20 object-cover"
+                  />
                 </button>
+              ))}
+            </div>
+
+            {project.galleryLink && (
+              <div className="rounded-3xl border border-purple-100/90 bg-purple-50/70 p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <div className="text-sm font-semibold text-purple-950">Link externo para visualização em carrossel</div>
+                  <p className="text-xs text-stone-600 mt-1">Abra um pdf, apresentação ou galeria externa com várias imagens.</p>
+                </div>
+                <a
+                  href={project.galleryLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-3 rounded-full bg-purple-950 text-white text-xs uppercase tracking-wider font-semibold hover:bg-purple-900 transition"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  Ver carrossel externo
+                </a>
               </div>
-            ))}
+            )}
           </div>
         </div>
       )}

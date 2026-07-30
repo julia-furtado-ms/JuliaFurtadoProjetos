@@ -16,6 +16,7 @@ export interface Project {
   tools: string[];
   coverImage: string;
   galleryImages: string[];
+  galleryLink?: string;
   status: PostStatus;
   views: number;
   publishedAt: string;
