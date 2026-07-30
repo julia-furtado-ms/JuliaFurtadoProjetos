@@ -9,7 +9,7 @@ interface AboutViewProps {
 
 export const AboutView: React.FC<AboutViewProps> = ({ onContactClick, onOpenImageLinksModal }) => {
   const [copiedPortrait, setCopiedPortrait] = useState(false);
-  const portraitUrl = '/portrait.svg';
+  const portraitUrl = 'https://drive.google.com/uc?export=view&id=1S-N9MfR7XTLBf7Ud_KNHzpzjoUQcoD_F';
 
   const handleCopyPortrait = () => {
     navigator.clipboard.writeText(window.location.origin + portraitUrl);
