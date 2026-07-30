@@ -10,7 +10,7 @@ interface AboutViewProps {
 
 export const AboutView: React.FC<AboutViewProps> = ({ onContactClick, onOpenImageLinksModal }) => {
   const [copiedPortrait, setCopiedPortrait] = useState(false);
-  const portraitUrl = normalizeImageUrl('https://drive.google.com/file/d/1S-N9MfR7XTLBf7Ud_KNHzpzjoUQcoD_F/view?usp=drive_link');
+  const portraitUrl = 'https://drive.usercontent.google.com/download?id=1S-N9MfR7XTLBf7Ud_KNHzpzjoUQcoD_F&export=view';
 
   const handleCopyPortrait = () => {
     navigator.clipboard.writeText(window.location.origin + portraitUrl);
@@ -31,6 +31,9 @@ export const AboutView: React.FC<AboutViewProps> = ({ onContactClick, onOpenImag
               src={portraitUrl}
               alt="Júlia Furtado - Designer de Produto"
               className="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-500"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=1200';
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-stone-950/30 via-transparent to-transparent" />
             
