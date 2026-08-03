@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SKILL_ITEMS } from '../data/mockProjects';
-import { normalizeImageUrl } from '../utils/normalizeImageUrl';
+import { getImageFallbackUrl, normalizeImageUrl } from '../utils/normalizeImageUrl';
 import { ArrowRight, MapPin, Award, BookOpen, Layers, Copy, Check, Sparkles, Cpu, Code, Palette, Search } from 'lucide-react';
 
 interface AboutViewProps {
@@ -10,12 +10,19 @@ interface AboutViewProps {
 
 export const AboutView: React.FC<AboutViewProps> = ({ onContactClick, onOpenImageLinksModal }) => {
   const [copiedPortrait, setCopiedPortrait] = useState(false);
-  const portraitUrl = '/portrait.jpg';
+  const portraitUrl = normalizeImageUrl('/portrait.jpg');
 
   const handleCopyPortrait = () => {
-    navigator.clipboard.writeText(window.location.origin + portraitUrl);
+    navigator.clipboard.writeText(portraitUrl.startsWith('http') ? portraitUrl : window.location.origin + portraitUrl);
     setCopiedPortrait(true);
     setTimeout(() => setCopiedPortrait(false), 2000);
+  };
+
+  const handlePortraitError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.currentTarget;
+    if (target.dataset.fallbackApplied === 'true') return;
+    target.dataset.fallbackApplied = 'true';
+    target.src = getImageFallbackUrl();
   };
 
   return (
@@ -31,9 +38,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onContactClick, onOpenImag
               src={portraitUrl}
               alt="Júlia Furtado - Designer de Produto"
               className="w-full aspect-[4/5] object-cover group-hover:scale-105 transition-transform duration-500"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=1200';
-              }}
+              onError={handlePortraitError}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-stone-950/30 via-transparent to-transparent" />
             
