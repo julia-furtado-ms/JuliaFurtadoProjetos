@@ -26,7 +26,7 @@ export interface Project {
 
 export interface SkillItem {
   name: string;
-  level: number;
+  level?: number;
   category: string;
   iconName?: string;
   description: string;

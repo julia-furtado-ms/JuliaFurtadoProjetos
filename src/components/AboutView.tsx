@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { SKILL_ITEMS } from '../data/mockProjects';
+import { SkillItem } from '../types';
 import { getImageFallbackUrl, normalizeImageUrl } from '../utils/normalizeImageUrl';
 import { ArrowRight, MapPin, Award, BookOpen, Layers, Copy, Check, Sparkles, Cpu, Code, Palette, Search } from 'lucide-react';
 
 interface AboutViewProps {
+  skills: SkillItem[];
   onContactClick: () => void;
   onOpenImageLinksModal: () => void;
 }
 
-export const AboutView: React.FC<AboutViewProps> = ({ onContactClick, onOpenImageLinksModal }) => {
+export const AboutView: React.FC<AboutViewProps> = ({ skills, onContactClick, onOpenImageLinksModal }) => {
   const [copiedPortrait, setCopiedPortrait] = useState(false);
   const portraitUrl = normalizeImageUrl('https://drive.google.com/file/d/1S-N9MfR7XTLBf7Ud_KNHzpzjoUQcoD_F/view');
 
@@ -109,26 +110,17 @@ export const AboutView: React.FC<AboutViewProps> = ({ onContactClick, onOpenImag
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {SKILL_ITEMS.map((skill) => (
+          {skills.map((skill) => (
             <div 
               key={skill.name}
               className="p-6 rounded-2xl bg-white border border-purple-100/80 hover:border-purple-300 shadow-sm transition-all space-y-3"
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs small-caps text-purple-900 font-semibold">{skill.category}</span>
-                <span className="text-xs font-mono text-stone-500">{skill.level}% Dominio</span>
               </div>
 
               <h3 className="text-lg font-medium text-stone-900">{skill.name}</h3>
               <p className="text-xs text-stone-600 leading-relaxed font-light">{skill.description}</p>
-
-              {/* Progress Bar */}
-              <div className="w-full bg-purple-100/50 h-2 rounded-full overflow-hidden border border-purple-200/50">
-                <div 
-                  className="bg-purple-900 h-full rounded-full transition-all duration-1000"
-                  style={{ width: `${skill.level}%` }}
-                />
-              </div>
             </div>
           ))}
         </div>

@@ -1,31 +1,39 @@
 import React, { useState } from 'react';
-import { Project, PostStatus, ProjectCategory } from '../types';
+import { Project, PostStatus, ProjectCategory, SkillItem } from '../types';
 import { getImageFallbackUrl, normalizeImageUrl } from '../utils/normalizeImageUrl';
-import { Plus, Search, Filter, Edit, Trash2, Eye, ToggleLeft, ToggleRight, Copy, Check, Sparkles, RefreshCw, Layers, FileText } from 'lucide-react';
+import { Plus, Search, Filter, Edit, Trash2, Eye, ToggleLeft, ToggleRight, Copy, Check, Sparkles, RefreshCw, Layers, FileText, Save, X } from 'lucide-react';
 
 interface AdminViewProps {
   projects: Project[];
+  skills: SkillItem[];
   onAddProjectClick: () => void;
   onEditProjectClick: (project: Project) => void;
   onDeleteProject: (id: string) => void;
   onToggleStatus: (id: string) => void;
   onResetProjects: () => void;
+  onSaveSkills: (skills: SkillItem[]) => void;
+  onResetSkills: () => void;
   onOpenImageLinksModal: () => void;
 }
 
 export const AdminView: React.FC<AdminViewProps> = ({
   projects,
+  skills,
   onAddProjectClick,
   onEditProjectClick,
   onDeleteProject,
   onToggleStatus,
   onResetProjects,
+  onSaveSkills,
+  onResetSkills,
   onOpenImageLinksModal,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('Todos');
   const [categoryFilter, setCategoryFilter] = useState<string>('Todas');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [skillDraft, setSkillDraft] = useState<SkillItem[]>(skills);
+  const [newSkill, setNewSkill] = useState({ name: '', category: '', description: '' });
 
   const categories = ['Todas', 'UI/UX Design', 'Design Systems', 'Branding', 'E-Commerce', 'Mobile'];
 
@@ -47,6 +55,29 @@ export const AdminView: React.FC<AdminViewProps> = ({
     navigator.clipboard.writeText(url);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleSkillChange = (index: number, field: keyof SkillItem, value: string) => {
+    setSkillDraft(prev => prev.map((skill, idx) => idx === index ? { ...skill, [field]: field === 'level' ? Number(value) : value } : skill));
+  };
+
+  const handleDeleteSkill = (index: number) => {
+    setSkillDraft(prev => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleAddSkill = () => {
+    if (!newSkill.name.trim() || !newSkill.category.trim() || !newSkill.description.trim()) return;
+    setSkillDraft(prev => [...prev, { ...newSkill, level: 0 }]);
+    setNewSkill({ name: '', category: '', description: '' });
+  };
+
+  const handleSaveSkillList = () => {
+    onSaveSkills(skillDraft);
+  };
+
+  const handleResetSkillList = () => {
+    onResetSkills();
+    setSkillDraft(skills);
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -147,6 +178,102 @@ export const AdminView: React.FC<AdminViewProps> = ({
         </button>
 
       </div>
+
+      {/* Skills Editor Section */}
+      <section className="rounded-3xl bg-white border border-purple-100/80 shadow-sm p-6 space-y-5">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-purple-100/80 text-purple-950 border border-purple-200 text-xs small-caps tracking-widest font-medium">
+              <Layers className="w-3.5 h-3.5 text-purple-700" />
+              <span>Gerenciar Habilidades & Ferramentas</span>
+            </div>
+            <h2 className="text-2xl font-serif text-stone-900 font-medium mt-3">Conhecimentos & Ferramentas</h2>
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              onClick={handleSaveSkillList}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-950 text-white text-xs uppercase tracking-wider font-semibold hover:bg-purple-900 transition"
+            >
+              <Save className="w-4 h-4" />
+              Salvar
+            </button>
+            <button
+              onClick={handleResetSkillList}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#FAF7F2] text-stone-700 border border-stone-200 text-xs uppercase tracking-wider font-semibold hover:text-purple-950 transition"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Resetar
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <input
+            type="text"
+            value={newSkill.name}
+            onChange={(e) => setNewSkill(prev => ({ ...prev, name: e.target.value }))}
+            placeholder="Nome da habilidade"
+            className="w-full px-3.5 py-2.5 rounded-lg bg-[#FAF7F2] border border-stone-200 text-stone-900 focus:outline-none focus:border-purple-600 font-sans"
+          />
+          <input
+            type="text"
+            value={newSkill.category}
+            onChange={(e) => setNewSkill(prev => ({ ...prev, category: e.target.value }))}
+            placeholder="Categoria"
+            className="w-full px-3.5 py-2.5 rounded-lg bg-[#FAF7F2] border border-stone-200 text-stone-900 focus:outline-none focus:border-purple-600 font-sans"
+          />
+          <button
+            type="button"
+            onClick={handleAddSkill}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-purple-950 text-white text-xs uppercase tracking-wider font-semibold hover:bg-purple-900 transition"
+          >
+            <Plus className="w-4 h-4" />
+            Adicionar
+          </button>
+        </div>
+
+        <textarea
+          rows={2}
+          value={newSkill.description}
+          onChange={(e) => setNewSkill(prev => ({ ...prev, description: e.target.value }))}
+          placeholder="Descrição da habilidade/ferramenta"
+          className="w-full px-3.5 py-2.5 rounded-lg bg-[#FAF7F2] border border-stone-200 text-stone-900 focus:outline-none focus:border-purple-600 font-sans"
+        />
+
+        <div className="space-y-3">
+          {skillDraft.map((skill, index) => (
+            <div key={`${skill.name}-${index}`} className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1.8fr_auto] gap-2 items-start rounded-2xl bg-[#FAF7F2] border border-stone-200 p-3">
+              <input
+                type="text"
+                value={skill.name}
+                onChange={(e) => handleSkillChange(index, 'name', e.target.value)}
+                className="px-3.5 py-2.5 rounded-lg bg-white border border-stone-200 text-stone-900 focus:outline-none focus:border-purple-600 font-sans"
+              />
+              <input
+                type="text"
+                value={skill.category}
+                onChange={(e) => handleSkillChange(index, 'category', e.target.value)}
+                className="px-3.5 py-2.5 rounded-lg bg-white border border-stone-200 text-stone-900 focus:outline-none focus:border-purple-600 font-sans"
+              />
+              <textarea
+                rows={2}
+                value={skill.description}
+                onChange={(e) => handleSkillChange(index, 'description', e.target.value)}
+                className="px-3.5 py-2.5 rounded-lg bg-white border border-stone-200 text-stone-900 focus:outline-none focus:border-purple-600 font-sans"
+              />
+              <button
+                type="button"
+                onClick={() => handleDeleteSkill(index)}
+                className="p-2 rounded-lg bg-white border border-stone-200 text-stone-600 hover:text-rose-700 hover:border-rose-200 transition-colors"
+                aria-label={`Remover habilidade ${index + 1}`}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* Projects Items List */}
       <div className="space-y-4">

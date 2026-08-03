@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { INITIAL_PROJECTS } from './data/mockProjects';
-import { Project } from './types';
+import { INITIAL_PROJECTS, SKILL_ITEMS } from './data/mockProjects';
+import { Project, SkillItem } from './types';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { HomeView } from './components/HomeView';
@@ -42,6 +42,21 @@ export default function App() {
     return INITIAL_PROJECTS;
   });
 
+  const [skills, setSkills] = useState<SkillItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('julia_furtado_skills_v1');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to load skills from localStorage:', err);
+    }
+    return SKILL_ITEMS;
+  });
+
   // Modals state
   const [isImageLinksModalOpen, setIsImageLinksModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
@@ -58,6 +73,14 @@ export default function App() {
       console.warn('Failed to save projects to localStorage:', err);
     }
   }, [projects]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('julia_furtado_skills_v1', JSON.stringify(skills));
+    } catch (err) {
+      console.warn('Failed to save skills to localStorage:', err);
+    }
+  }, [skills]);
 
   useEffect(() => {
     try {
@@ -128,6 +151,19 @@ export default function App() {
       } catch (e) {
         // ignore
       }
+    }
+  };
+
+  const handleSaveSkills = (nextSkills: SkillItem[]) => {
+    setSkills(nextSkills);
+  };
+
+  const handleResetSkills = () => {
+    setSkills(SKILL_ITEMS);
+    try {
+      localStorage.removeItem('julia_furtado_skills_v1');
+    } catch (e) {
+      // ignore
     }
   };
 
@@ -207,6 +243,7 @@ export default function App() {
 
             {activeTab === 'about' && (
               <AboutView
+                skills={skills}
                 onContactClick={handleContactClick}
                 onOpenImageLinksModal={() => setIsImageLinksModalOpen(true)}
               />
@@ -219,6 +256,7 @@ export default function App() {
             {activeTab === 'admin' && (
               <AdminView
                 projects={projects}
+                skills={skills}
                 onAddProjectClick={() => {
                   setEditingProject(null);
                   setIsProjectModalOpen(true);
@@ -230,6 +268,8 @@ export default function App() {
                 onDeleteProject={handleDeleteProject}
                 onToggleStatus={handleToggleStatus}
                 onResetProjects={handleResetProjects}
+                onSaveSkills={handleSaveSkills}
+                onResetSkills={handleResetSkills}
                 onOpenImageLinksModal={() => setIsImageLinksModalOpen(true)}
               />
             )}
