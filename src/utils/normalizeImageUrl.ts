@@ -23,6 +23,6 @@ export function normalizeImageUrl(url: string | undefined | null): string {
   return trimmed;
 }
 
-export function getImageFallbackUrl(): string {
+export function getImageFallbackUrl(https: any): string {
   return FALLBACK_IMAGE_URL;
 }

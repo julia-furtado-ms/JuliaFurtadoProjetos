@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Project, PostStatus, ProjectCategory } from '../types';
-import { normalizeImageUrl } from '../utils/normalizeImageUrl';
+import { getImageFallbackUrl, normalizeImageUrl } from '../utils/normalizeImageUrl';
 import { Plus, Search, Filter, Edit, Trash2, Eye, ToggleLeft, ToggleRight, Copy, Check, Sparkles, RefreshCw, Layers, FileText } from 'lucide-react';
 
 interface AdminViewProps {
@@ -53,7 +53,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
     const target = e.currentTarget;
     if (target.dataset.fallbackApplied === 'true') return;
     target.dataset.fallbackApplied = 'true';
-    target.src = getImageFallbackUrl();
+    target.src = getImageFallbackUrl('https://drive.google.com/file/d/1S-N9MfR7XTLBf7Ud_KNHzpzjoUQcoD_F/view');
   };
 
   return (
