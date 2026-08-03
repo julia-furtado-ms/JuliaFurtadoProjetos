@@ -22,7 +22,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onContactClick, onOpenImag
     const target = e.currentTarget;
     if (target.dataset.fallbackApplied === 'true') return;
     target.dataset.fallbackApplied = 'true';
-    target.src = getImageFallbackUrl();
+    target.src = getImageFallbackUrl(target.currentSrc || portraitUrl);
   };
 
   return (

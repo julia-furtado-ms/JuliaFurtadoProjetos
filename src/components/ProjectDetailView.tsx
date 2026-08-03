@@ -44,7 +44,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
     const target = e.currentTarget;
     if (target.dataset.fallbackApplied === 'true') return;
     target.dataset.fallbackApplied = 'true';
-    target.src = getImageFallbackUrl();
+    target.src = getImageFallbackUrl(target.currentSrc || target.src);
   };
 
   return (
