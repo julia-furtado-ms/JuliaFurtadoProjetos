@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Project, ProjectCategory } from '../types';
-import { normalizeImageUrl } from '../utils/normalizeImageUrl';
+import { getImageFallbackUrl, normalizeImageUrl } from '../utils/normalizeImageUrl';
 import { ArrowRight, Sparkles, Eye, Filter, Copy, Check, ExternalLink, Image } from 'lucide-react';
 
 interface HomeViewProps {
@@ -32,6 +32,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
     navigator.clipboard.writeText(url);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.currentTarget;
+    if (target.dataset.fallbackApplied === 'true') return;
+    target.dataset.fallbackApplied = 'true';
+    target.src = getImageFallbackUrl();
   };
 
   return (
@@ -123,6 +130,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     alt={project.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
+                    onError={handleImageError}
                   />
                   
                   <div className="absolute inset-0 bg-stone-950/10 group-hover:bg-stone-950/20 transition-colors" />

@@ -49,6 +49,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.currentTarget;
+    if (target.dataset.fallbackApplied === 'true') return;
+    target.dataset.fallbackApplied = 'true';
+    target.src = getImageFallbackUrl();
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
       
@@ -167,6 +174,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
                       src={normalizeImageUrl(project.coverImage)}
                       alt={project.title}
                       className="w-full h-full object-cover"
+                      onError={handleImageError}
                     />
                   </div>
 

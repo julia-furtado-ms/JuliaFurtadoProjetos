@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Project } from '../types';
-import { normalizeImageUrl } from '../utils/normalizeImageUrl';
+import { getImageFallbackUrl, normalizeImageUrl } from '../utils/normalizeImageUrl';
 import { ArrowLeft, ExternalLink, Calendar, User, Wrench, Building, Copy, Check, Eye, Share2, Image, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProjectDetailViewProps {
@@ -38,6 +38,13 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
     navigator.clipboard.writeText(url);
     setCopiedGalleryIndex(index);
     setTimeout(() => setCopiedGalleryIndex(null), 2000);
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.currentTarget;
+    if (target.dataset.fallbackApplied === 'true') return;
+    target.dataset.fallbackApplied = 'true';
+    target.src = getImageFallbackUrl();
   };
 
   return (
@@ -124,6 +131,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
             src={normalizeImageUrl(project.coverImage)}
             alt={project.title}
             className="w-full h-full object-cover"
+            onError={handleImageError}
           />
           <div className="absolute inset-0 bg-stone-950/10" />
 
@@ -183,6 +191,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                 src={normalizeImageUrl(project.galleryImages[activeGalleryIndex])}
                 alt={`${project.title} - Visual ${activeGalleryIndex + 1}`}
                 className="w-full h-full object-cover"
+                onError={handleImageError}
               />
 
               {project.galleryImages.length > 1 && (
@@ -216,6 +225,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                     src={normalizeImageUrl(imgUrl)}
                     alt={`Thumbnail ${idx + 1}`}
                     className="w-28 h-20 object-cover"
+                    onError={handleImageError}
                   />
                 </button>
               ))}
