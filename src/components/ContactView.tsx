@@ -8,7 +8,7 @@ export const ContactView: React.FC = () => {
     email: '',
     subject: '',
     message: '',
-    budgetRange: 'R$ 5k - R$ 15k'
+    budgetRange: 'Não se aplica'
   });
 
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -24,6 +24,20 @@ export const ContactView: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
+
+    const subject = formData.subject.trim() || 'Mensagem do site';
+    const budgetRange = formData.budgetRange?.trim() || 'Não se aplica';
+    const emailBody = [
+      `Nome: ${formData.name}`,
+      `E-mail: ${formData.email}`,
+      `Assunto: ${subject}`,
+      `Estimativa de Orçamento: ${budgetRange}`,
+      '',
+      'Mensagem:',
+      formData.message,
+    ].join('\n');
+
+    window.location.href = `mailto:${emailAddress}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
     setSubmitted(true);
   };
 
@@ -147,8 +161,8 @@ export const ContactView: React.FC = () => {
                 </p>
                 <button
                   onClick={() => {
-                    setSubmitted(false);
-                    setFormData({ name: '', email: '', subject: '', message: '', budgetRange: 'R$ 5k - R$ 15k' });
+                      setSubmitted(false);
+                    setFormData({ name: '', email: '', subject: '', message: '', budgetRange: 'Não se aplica' });
                   }}
                   className="px-6 py-2.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-950 text-xs small-caps transition-colors border border-purple-200 font-medium"
                 >
@@ -207,6 +221,7 @@ export const ContactView: React.FC = () => {
                       onChange={(e) => setFormData({ ...formData, budgetRange: e.target.value })}
                       className="w-full px-4 py-3 rounded-lg bg-[#FAF7F2] border border-stone-200 text-stone-900 text-sm focus:outline-none focus:border-purple-600 transition-colors"
                     >
+                      <option value="Não se aplica">Não se aplica</option>
                       <option value="R$ 5k - R$ 15k">R$ 5.000 — R$ 15.000</option>
                       <option value="R$ 15k - R$ 35k">R$ 15.000 — R$ 35.000</option>
                       <option value="R$ 35k+">Acima de R$ 35.000</option>
