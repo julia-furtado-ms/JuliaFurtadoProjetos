@@ -43,7 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
                 Atelier
               </span>
             </div>
-            <p className="text-xs text-stone-500 hidden sm:block font-light">Design Estratégico & Arquitetura Digital</p>
+            <p className="text-xs text-stone-500 hidden sm:block font-light">Design & Criatividade</p>
           </div>
         </button>
 

@@ -212,13 +212,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="lg:col-span-5 space-y-4">
               <div className="relative rounded-2xl overflow-hidden border border-stone-300/80 shadow-xl bg-stone-200">
                 <img
-                  src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Marco_Zero_-_Recife_Antigo_-_Recife%2C_Pernambuco%2C_Brasil.jpg/1280px-Marco_Zero_-_Recife_Antigo_-_Recife%2C_Pernambuco%2C_Brasil.jpg"
                   alt="Workspace de Design e Arquitetura de Informação"
                   className="w-full h-80 lg:h-96 object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-stone-900/40 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 text-xs font-mono text-stone-800 bg-white/90 p-3 rounded-xl border border-stone-200 backdrop-blur-md shadow-sm">
-                  <span>Espaço de Trabalho • Recife, Brasil</span>
+                  <span>Trabalho Presencial • Recife, Brasil</span>
                 </div>
               </div>
             </div>
@@ -228,22 +228,22 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div className="text-xs small-caps uppercase tracking-widest text-purple-900 font-semibold">Filosofia de Design</div>
               
               <h2 className="text-3xl sm:text-4xl font-serif text-stone-900 leading-tight">
-                Simplicidade Intencional & <br className="hidden sm:inline" />
-                <span className="italic font-serif text-purple-900">Arquitetura de Informação Rigorosa</span>
+                Soluções com Acessibilidade, <br className="hidden sm:inline" />
+                <span className="italic font-serif text-purple-900">Criatividade & Estratégia </span>
               </h2>
 
               <p className="text-stone-700 text-base leading-relaxed font-sans font-light">
-                Acredito que interfaces excepcionais não dependem de ornamentos superficiais, mas sim da clareza com que resolvem problemas reais. Todo Pixel deve possuir uma razão de existir baseada nas necessidades do usuário e nos objetivos do negócio.
+                Acredito que cada problema merece um estudo cuidadoso, com uma solução criativa e empática.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div className="p-4 rounded-xl bg-white border border-purple-100 shadow-sm space-y-1">
-                  <h4 className="text-sm font-semibold text-purple-950">Redução de Carga Cognitiva</h4>
-                  <p className="text-xs text-stone-600 font-light">Hierarquias visuais matemáticas que orientam a atenção sem sobrecarregar o usuário.</p>
+                  <h4 className="text-sm font-semibold text-purple-950">Acessibilidade</h4>
+                  <p className="text-xs text-stone-600 font-light">Escolha de cores e tamanhos que se adequem aos usuários mais diversos.</p>
                 </div>
                 <div className="p-4 rounded-xl bg-white border border-purple-100 shadow-sm space-y-1">
-                  <h4 className="text-sm font-semibold text-purple-950">Sistemas Escaláveis</h4>
-                  <p className="text-xs text-stone-600 font-light">Tokens e componentes padronizados que garantem consistência e agilidade no dev.</p>
+                  <h4 className="text-sm font-semibold text-purple-950">Inovação</h4>
+                  <p className="text-xs text-stone-600 font-light">Pensar fora da caixa e sempre questionar para encontrar as soluções mais inovadoras.</p>
                 </div>
               </div>
 

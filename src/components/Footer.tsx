@@ -29,7 +29,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavClick, onOpenImageLinksModa
             </div>
             <p className="text-sm text-stone-600 max-w-md leading-relaxed font-light">
               Design de produto, sistemas de interface e prototipagem interativa.
-              Criando soluções digitais que combinam clareza funcional e elegância visual sob medida.
+              Criando soluções que combinam criatividade e funcionalidade.
             </p>
             <div className="flex items-center gap-2 text-xs text-stone-500 font-light">
               <MapPin className="w-3.5 h-3.5 text-purple-700" />
@@ -84,7 +84,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavClick, onOpenImageLinksModa
           
           <div className="flex items-center gap-4">
             <a 
-              href="https://linkedin.com" 
+              href="https://www.linkedin.com/in/julia-furtado-ms/" 
               target="_blank" 
               rel="noreferrer"
               className="hover:text-purple-950 transition-colors p-1"
