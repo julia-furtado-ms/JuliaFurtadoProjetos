@@ -14,6 +14,7 @@ export const ContactView: React.FC = () => {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const emailAddress = 'julifurtado22@gmail.com';
 
   const handleCopyEmail = () => {
@@ -27,6 +28,7 @@ export const ContactView: React.FC = () => {
     if (!formData.name || !formData.email || !formData.message) return;
 
     setIsSubmitting(true);
+    setErrorMessage('');
 
     const subject = formData.subject.trim() || 'Mensagem do site';
     const budgetRange = formData.budgetRange?.trim() || 'Não se aplica';
@@ -56,7 +58,8 @@ export const ContactView: React.FC = () => {
       setFormData({ name: '', email: '', subject: '', message: '', budgetRange: 'Não se aplica' });
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);
-      alert('Não foi possível enviar a mensagem no momento. Verifique se o servidor de e-mail está configurado corretamente.');
+      const message = error instanceof Error ? error.message : 'Não foi possível enviar a mensagem no momento.';
+      setErrorMessage(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -262,6 +265,12 @@ export const ContactView: React.FC = () => {
                     className="w-full px-4 py-3 rounded-lg bg-[#FAF7F2] border border-stone-200 text-stone-900 text-sm focus:outline-none focus:border-purple-600 transition-colors leading-relaxed"
                   />
                 </div>
+
+                {errorMessage && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {errorMessage}
+                  </div>
+                )}
 
                 <button
                   type="submit"

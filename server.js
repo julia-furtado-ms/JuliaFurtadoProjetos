@@ -9,12 +9,41 @@ const port = process.env.PORT || 3001;
 
 app.use(express.json());
 
+const recipientEmail = process.env.CONTACT_TO || 'julifurtado22@gmail.com';
+
 app.get('/api/health', (_req, res) => {
   res.json({
     success: true,
     smtpConfigured: Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS),
   });
 });
+
+async function sendWithFormSubmit(payload, res) {
+  const response = await fetch(`https://formsubmit.co/ajax/${recipientEmail}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      name: payload.name,
+      email: payload.email,
+      subject: payload.subject,
+      budgetRange: payload.budgetRange,
+      message: payload.message,
+      _captcha: 'false',
+      _template: 'table',
+      _subject: `Nova mensagem do site - ${payload.subject || 'Mensagem do site'}`,
+      _next: process.env.APP_URL || 'http://localhost:3000',
+    }).toString(),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || 'Falha no fallback de envio.');
+  }
+
+  return res.json({ success: true, mode: 'formsubmit' });
+}
 
 app.post('/api/contact', async (req, res) => {
   try {
@@ -24,56 +53,63 @@ app.post('/api/contact', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Nome, e-mail e mensagem são obrigatórios.' });
     }
 
-    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-      return res.status(503).json({
-        success: false,
-        error: 'Configuração SMTP incompleta. Defina SMTP_HOST, SMTP_USER e SMTP_PASS no arquivo .env.',
-      });
-    }
-
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT || 587),
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-
     const normalizedMessage = String(message).replace(/\r\n/g, '\n');
-
-    const mailOptions = {
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
-      to: process.env.CONTACT_TO || 'julifurtado22@gmail.com',
-      replyTo: email,
-      subject: `Nova mensagem do site - ${subject || 'Mensagem do site'}`,
-      text: [
-        `Nome: ${name}`,
-        `E-mail: ${email}`,
-        `Assunto: ${subject || 'Mensagem do site'}`,
-        `Estimativa de Orçamento: ${budgetRange || 'Não se aplica'}`,
-        '',
-        'Mensagem:',
-        normalizedMessage,
-      ].join('\n'),
-      html: `
-        <p><strong>Nome:</strong> ${name}</p>
-        <p><strong>E-mail:</strong> ${email}</p>
-        <p><strong>Assunto:</strong> ${subject || 'Mensagem do site'}</p>
-        <p><strong>Estimativa de Orçamento:</strong> ${budgetRange || 'Não se aplica'}</p>
-        <br />
-        <p><strong>Mensagem:</strong></p>
-        <p>${normalizedMessage.replace(/\n/g, '<br />')}</p>
-      `,
+    const payload = {
+      name: String(name),
+      email: String(email),
+      subject: String(subject || 'Mensagem do site'),
+      budgetRange: String(budgetRange || 'Não se aplica'),
+      message: normalizedMessage,
     };
 
-    await transporter.sendMail(mailOptions);
+    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+      try {
+        const transporter = nodemailer.createTransport({
+          host: process.env.SMTP_HOST,
+          port: Number(process.env.SMTP_PORT || 587),
+          secure: false,
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+          },
+        });
 
-    return res.json({ success: true });
+        const mailOptions = {
+          from: process.env.SMTP_FROM || process.env.SMTP_USER,
+          to: recipientEmail,
+          replyTo: payload.email,
+          subject: `Nova mensagem do site - ${payload.subject}`,
+          text: [
+            `Nome: ${payload.name}`,
+            `E-mail: ${payload.email}`,
+            `Assunto: ${payload.subject}`,
+            `Estimativa de Orçamento: ${payload.budgetRange}`,
+            '',
+            'Mensagem:',
+            payload.message,
+          ].join('\n'),
+          html: `
+            <p><strong>Nome:</strong> ${payload.name}</p>
+            <p><strong>E-mail:</strong> ${payload.email}</p>
+            <p><strong>Assunto:</strong> ${payload.subject}</p>
+            <p><strong>Estimativa de Orçamento:</strong> ${payload.budgetRange}</p>
+            <br />
+            <p><strong>Mensagem:</strong></p>
+            <p>${payload.message.replace(/\n/g, '<br />')}</p>
+          `,
+        };
+
+        await transporter.sendMail(mailOptions);
+        return res.json({ success: true, mode: 'smtp' });
+      } catch (smtpError) {
+        console.warn('SMTP falhou, tentando fallback:', smtpError);
+      }
+    }
+
+    return sendWithFormSubmit(payload, res);
   } catch (error) {
     console.error('Erro ao enviar e-mail:', error);
-    return res.status(500).json({ success: false, error: 'Erro interno ao processar o formulário.' });
+    return res.status(500).json({ success: false, error: 'Não foi possível enviar a mensagem neste momento.' });
   }
 });
 
