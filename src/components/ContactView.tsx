@@ -37,7 +37,9 @@ export const ContactView: React.FC = () => {
       formData.message,
     ].join('\n');
 
-    window.location.href = `mailto:${emailAddress}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+    const mailtoLink = `mailto:${emailAddress}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+
+    window.location.href = mailtoLink;
     setSubmitted(true);
   };
 
