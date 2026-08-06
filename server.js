@@ -1,11 +1,13 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 app.use(express.json());
 
@@ -18,31 +20,32 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
-async function sendWithFormSubmit(payload, res) {
-  const response = await fetch(`https://formsubmit.co/ajax/${recipientEmail}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      name: payload.name,
-      email: payload.email,
-      subject: payload.subject,
-      budgetRange: payload.budgetRange,
-      message: payload.message,
-      _captcha: 'false',
-      _template: 'table',
-      _subject: `Nova mensagem do site - ${payload.subject || 'Mensagem do site'}`,
-      _next: process.env.APP_URL || 'http://localhost:3000',
-    }).toString(),
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || 'Falha no fallback de envio.');
+async function sendWithResend(payload, res) {
+  if (!resend) {
+    throw new Error('RESEND_API_KEY não configurada.');
   }
 
-  return res.json({ success: true, mode: 'formsubmit' });
+  const emailResponse = await resend.emails.send({
+    from: process.env.RESEND_FROM || 'onboarding@resend.dev',
+    to: [recipientEmail],
+    replyTo: payload.email,
+    subject: `Nova mensagem do site - ${payload.subject}`,
+    html: `
+      <p><strong>Nome:</strong> ${payload.name}</p>
+      <p><strong>E-mail:</strong> ${payload.email}</p>
+      <p><strong>Assunto:</strong> ${payload.subject}</p>
+      <p><strong>Estimativa de Orçamento:</strong> ${payload.budgetRange}</p>
+      <br />
+      <p><strong>Mensagem:</strong></p>
+      <p>${payload.message.replace(/\n/g, '<br />')}</p>
+    `,
+  });
+
+  if (emailResponse.error) {
+    throw new Error(emailResponse.error.message || 'Falha ao enviar com Resend.');
+  }
+
+  return res.json({ success: true, mode: 'resend' });
 }
 
 app.post('/api/contact', async (req, res) => {
@@ -106,7 +109,7 @@ app.post('/api/contact', async (req, res) => {
       }
     }
 
-    return sendWithFormSubmit(payload, res);
+    return sendWithResend(payload, res);
   } catch (error) {
     console.error('Erro ao enviar e-mail:', error);
     return res.status(500).json({ success: false, error: 'Não foi possível enviar a mensagem neste momento.' });
