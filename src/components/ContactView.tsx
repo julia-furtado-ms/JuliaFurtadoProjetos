@@ -13,6 +13,7 @@ export const ContactView: React.FC = () => {
 
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const emailAddress = 'julifurtado22@gmail.com';
 
   const handleCopyEmail = () => {
@@ -21,26 +22,44 @@ export const ContactView: React.FC = () => {
     setTimeout(() => setCopiedEmail(false), 2000);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
 
+    setIsSubmitting(true);
+
     const subject = formData.subject.trim() || 'Mensagem do site';
     const budgetRange = formData.budgetRange?.trim() || 'Não se aplica';
-    const emailBody = [
-      `Nome: ${formData.name}`,
-      `E-mail: ${formData.email}`,
-      `Assunto: ${subject}`,
-      `Estimativa de Orçamento: ${budgetRange}`,
-      '',
-      'Mensagem:',
-      formData.message,
-    ].join('\n');
 
-    const mailtoLink = `mailto:${emailAddress}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject,
+          budgetRange,
+          message: formData.message,
+        }),
+      });
 
-    window.location.href = mailtoLink;
-    setSubmitted(true);
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Falha ao enviar mensagem');
+      }
+
+      setSubmitted(true);
+      setFormData({ name: '', email: '', subject: '', message: '', budgetRange: 'Não se aplica' });
+    } catch (error) {
+      console.error('Erro ao enviar mensagem:', error);
+      alert('Não foi possível enviar a mensagem no momento. Verifique se o servidor de e-mail está configurado corretamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -246,10 +265,11 @@ export const ContactView: React.FC = () => {
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-lg bg-purple-950 hover:bg-purple-900 text-white font-bold uppercase tracking-wider text-xs transition-all shadow-xl flex items-center justify-center gap-2 active:scale-95"
+                  disabled={isSubmitting}
+                  className="w-full py-3.5 rounded-lg bg-purple-950 hover:bg-purple-900 text-white font-bold uppercase tracking-wider text-xs transition-all shadow-xl flex items-center justify-center gap-2 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   <Send className="w-4 h-4 text-purple-200" />
-                  <span>Enviar Mensagem</span>
+                  <span>{isSubmitting ? 'Enviando...' : 'Enviar Mensagem'}</span>
                 </button>
               </form>
             )}
