@@ -13,6 +13,8 @@ export const ContactView: React.FC = () => {
 
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submittedName, setSubmittedName] = useState('');
+  const [submittedEmail, setSubmittedEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const emailAddress = 'julifurtado22@gmail.com';
@@ -54,6 +56,8 @@ export const ContactView: React.FC = () => {
         throw new Error(data.error || 'Falha ao enviar mensagem');
       }
 
+      setSubmittedName(formData.name);
+      setSubmittedEmail(formData.email);
       setSubmitted(true);
       setFormData({ name: '', email: '', subject: '', message: '', budgetRange: 'Não se aplica' });
     } catch (error) {
@@ -181,11 +185,13 @@ export const ContactView: React.FC = () => {
                 </div>
                 <h3 className="text-2xl font-serif text-stone-900 font-medium">Mensagem Enviada!</h3>
                 <p className="text-stone-600 max-w-md mx-auto text-sm leading-relaxed font-light">
-                  Obrigada pelo contato, <span className="text-purple-950 font-medium">{formData.name}</span>. Responderei ao e-mail <span className="text-purple-950 font-medium">{formData.email}</span> em até 24 horas úteis.
+                  Obrigada pelo contato, <span className="text-purple-950 font-medium">{submittedName}</span>. Responderei ao e-mail <span className="text-purple-950 font-medium">{submittedEmail}</span> em até 24 horas úteis.
                 </p>
                 <button
                   onClick={() => {
-                      setSubmitted(false);
+                    setSubmitted(false);
+                    setSubmittedName('');
+                    setSubmittedEmail('');
                     setFormData({ name: '', email: '', subject: '', message: '', budgetRange: 'Não se aplica' });
                   }}
                   className="px-6 py-2.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-950 text-xs small-caps transition-colors border border-purple-200 font-medium"
