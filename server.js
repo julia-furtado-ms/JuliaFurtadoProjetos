@@ -1,35 +1,79 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
-import { Resend } from 'resend';
+import { createClient } from '@supabase/supabase-js';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const recipientEmail = process.env.CONTACT_TO || 'julifurtado22@gmail.com';
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+const supabase = supabaseUrl && supabaseKey
+  ? createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false, autoRefreshToken: false } })
+  : null;
 
 app.use(express.json());
-
-const recipientEmail = process.env.CONTACT_TO || 'julifurtado22@gmail.com';
 
 app.get('/api/health', (_req, res) => {
   res.json({
     success: true,
     smtpConfigured: Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS),
+    supabaseConfigured: Boolean(supabaseUrl && supabaseKey),
   });
 });
 
-async function sendWithResend(payload, res) {
-  if (!resend) {
-    throw new Error('RESEND_API_KEY não configurada.');
+async function saveWithSupabase(payload) {
+  if (!supabase) {
+    throw new Error('SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY não configurados.');
   }
 
-  const emailResponse = await resend.emails.send({
-    from: process.env.RESEND_FROM || 'onboarding@resend.dev',
-    to: [recipientEmail],
+  const { error } = await supabase.from('contact_messages').insert([
+    {
+      name: payload.name,
+      email: payload.email,
+      subject: payload.subject,
+      budget_range: payload.budgetRange,
+      message: payload.message,
+      created_at: new Date().toISOString(),
+    },
+  ]);
+
+  if (error) {
+    throw error;
+  }
+}
+
+async function sendWithSmtp(payload, res) {
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    throw new Error('SMTP não configurado.');
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT || 587),
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    to: recipientEmail,
     replyTo: payload.email,
     subject: `Nova mensagem do site - ${payload.subject}`,
+    text: [
+      `Nome: ${payload.name}`,
+      `E-mail: ${payload.email}`,
+      `Assunto: ${payload.subject}`,
+      `Estimativa de Orçamento: ${payload.budgetRange}`,
+      '',
+      'Mensagem:',
+      payload.message,
+    ].join('\n'),
     html: `
       <p><strong>Nome:</strong> ${payload.name}</p>
       <p><strong>E-mail:</strong> ${payload.email}</p>
@@ -39,13 +83,10 @@ async function sendWithResend(payload, res) {
       <p><strong>Mensagem:</strong></p>
       <p>${payload.message.replace(/\n/g, '<br />')}</p>
     `,
-  });
+  };
 
-  if (emailResponse.error) {
-    throw new Error(emailResponse.error.message || 'Falha ao enviar com Resend.');
-  }
-
-  return res.json({ success: true, mode: 'resend' });
+  await transporter.sendMail(mailOptions);
+  return res.json({ success: true, mode: 'smtp' });
 }
 
 app.post('/api/contact', async (req, res) => {
@@ -67,49 +108,22 @@ app.post('/api/contact', async (req, res) => {
 
     if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
       try {
-        const transporter = nodemailer.createTransport({
-          host: process.env.SMTP_HOST,
-          port: Number(process.env.SMTP_PORT || 587),
-          secure: false,
-          auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-          },
-        });
-
-        const mailOptions = {
-          from: process.env.SMTP_FROM || process.env.SMTP_USER,
-          to: recipientEmail,
-          replyTo: payload.email,
-          subject: `Nova mensagem do site - ${payload.subject}`,
-          text: [
-            `Nome: ${payload.name}`,
-            `E-mail: ${payload.email}`,
-            `Assunto: ${payload.subject}`,
-            `Estimativa de Orçamento: ${payload.budgetRange}`,
-            '',
-            'Mensagem:',
-            payload.message,
-          ].join('\n'),
-          html: `
-            <p><strong>Nome:</strong> ${payload.name}</p>
-            <p><strong>E-mail:</strong> ${payload.email}</p>
-            <p><strong>Assunto:</strong> ${payload.subject}</p>
-            <p><strong>Estimativa de Orçamento:</strong> ${payload.budgetRange}</p>
-            <br />
-            <p><strong>Mensagem:</strong></p>
-            <p>${payload.message.replace(/\n/g, '<br />')}</p>
-          `,
-        };
-
-        await transporter.sendMail(mailOptions);
-        return res.json({ success: true, mode: 'smtp' });
+        return await sendWithSmtp(payload, res);
       } catch (smtpError) {
-        console.warn('SMTP falhou, tentando fallback:', smtpError);
+        console.warn('SMTP falhou, tentando Supabase:', smtpError);
       }
     }
 
-    return sendWithResend(payload, res);
+    if (supabase) {
+      try {
+        await saveWithSupabase(payload);
+        return res.json({ success: true, mode: 'supabase' });
+      } catch (supabaseError) {
+        console.warn('Supabase falhou:', supabaseError);
+      }
+    }
+
+    return res.status(500).json({ success: false, error: 'Não foi possível enviar a mensagem. Configure SMTP ou Supabase.' });
   } catch (error) {
     console.error('Erro ao enviar e-mail:', error);
     return res.status(500).json({ success: false, error: 'Não foi possível enviar a mensagem neste momento.' });

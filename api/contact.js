@@ -1,9 +1,13 @@
 import dotenv from 'dotenv';
-import { Resend } from 'resend';
+import { createClient } from '@supabase/supabase-js';
 
 dotenv.config();
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+const supabase = supabaseUrl && supabaseKey
+  ? createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false, autoRefreshToken: false } })
+  : null;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -19,35 +23,71 @@ export default async function handler(req, res) {
       return;
     }
 
-    if (!resend) {
-      res.status(500).json({ success: false, error: 'RESEND_API_KEY não configurada.' });
+    if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+      const nodemailer = (await import('nodemailer')).default;
+      const recipientEmail = process.env.CONTACT_TO || 'julifurtado22@gmail.com';
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT || 587),
+        secure: false,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || process.env.SMTP_USER,
+        to: recipientEmail,
+        replyTo: email,
+        subject: `Nova mensagem do site - ${subject || 'Mensagem do site'}`,
+        text: [
+          `Nome: ${name}`,
+          `E-mail: ${email}`,
+          `Assunto: ${subject || 'Mensagem do site'}`,
+          `Estimativa de Orçamento: ${budgetRange || 'Não se aplica'}`,
+          '',
+          'Mensagem:',
+          String(message).replace(/\r\n/g, '\n'),
+        ].join('\n'),
+        html: `
+          <p><strong>Nome:</strong> ${name}</p>
+          <p><strong>E-mail:</strong> ${email}</p>
+          <p><strong>Assunto:</strong> ${subject || 'Mensagem do site'}</p>
+          <p><strong>Estimativa de Orçamento:</strong> ${budgetRange || 'Não se aplica'}</p>
+          <br />
+          <p><strong>Mensagem:</strong></p>
+          <p>${String(message).replace(/\n/g, '<br />')}</p>
+        `,
+      });
+
+      res.status(200).json({ success: true, mode: 'smtp' });
       return;
     }
 
-    const recipientEmail = process.env.CONTACT_TO || 'julifurtado22@gmail.com';
-    const emailResponse = await resend.emails.send({
-      from: process.env.RESEND_FROM || 'onboarding@resend.dev',
-      to: [recipientEmail],
-      replyTo: email,
-      subject: `Nova mensagem do site - ${subject || 'Mensagem do site'}`,
-      html: `
-        <p><strong>Nome:</strong> ${name}</p>
-        <p><strong>E-mail:</strong> ${email}</p>
-        <p><strong>Assunto:</strong> ${subject || 'Mensagem do site'}</p>
-        <p><strong>Estimativa de Orçamento:</strong> ${budgetRange || 'Não se aplica'}</p>
-        <br />
-        <p><strong>Mensagem:</strong></p>
-        <p>${String(message).replace(/\n/g, '<br />')}</p>
-      `,
-    });
-
-    if (emailResponse.error) {
-      throw new Error(emailResponse.error.message || 'Falha ao enviar com Resend.');
+    if (!supabase) {
+      res.status(500).json({ success: false, error: 'Configure SMTP ou Supabase para receber mensagens.' });
+      return;
     }
 
-    res.status(200).json({ success: true, mode: 'resend' });
+    const { error } = await supabase.from('contact_messages').insert([
+      {
+        name: String(name),
+        email: String(email),
+        subject: String(subject || 'Mensagem do site'),
+        budget_range: String(budgetRange || 'Não se aplica'),
+        message: String(message).replace(/\r\n/g, '\n'),
+        created_at: new Date().toISOString(),
+      },
+    ]);
+
+    if (error) {
+      throw error;
+    }
+
+    res.status(200).json({ success: true, mode: 'supabase' });
   } catch (error) {
-    console.error('Erro ao enviar e-mail:', error);
-    res.status(500).json({ success: false, error: 'Não foi possível enviar a mensagem neste momento.' });
+    console.error('Erro ao processar mensagem:', error);
+    res.status(500).json({ success: false, error: 'Não foi possível processar a mensagem neste momento.' });
   }
 }
