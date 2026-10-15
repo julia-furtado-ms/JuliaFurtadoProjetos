@@ -85,15 +85,19 @@ export const AboutView: React.FC<AboutViewProps> = ({ skills, onContactClick, on
           <div className="pt-2 flex flex-wrap gap-4 text-xs text-stone-600 font-light">
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-purple-100 shadow-sm text-purple-950 font-medium">
               <MapPin className="w-3.5 h-3.5 text-purple-700" />
-              <span>Recife • Atuação Global</span>
+              <span>Recife</span>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-purple-100 shadow-sm text-purple-950 font-medium">
               <Award className="w-3.5 h-3.5 text-purple-700" />
-              <span>6+ Anos de Experiência</span>
+              <span>Design Gráfico</span>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-purple-100 shadow-sm text-purple-950 font-medium">
               <BookOpen className="w-3.5 h-3.5 text-purple-700" />
-              <span>CESAR School & PUCRS</span>
+              <span>CESAR School • Design</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-purple-100 shadow-sm text-purple-950 font-medium">
+              <BookOpen className="w-3.5 h-3.5 text-purple-700" />
+              <span>Administração • UPE</span>
             </div>
           </div>
 
