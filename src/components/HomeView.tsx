@@ -65,7 +65,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-100/80 text-purple-950 border border-purple-200 text-xs small-caps tracking-widest shadow-sm">
             <Sparkles className="w-3.5 h-3.5 text-purple-700" />
-            <span>Design de Produto & UX/UI • Atelier Recife</span>
+            <span>Designer • Recife</span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl md:text-7xl font-serif tracking-tight text-stone-900 leading-[1.1]">
