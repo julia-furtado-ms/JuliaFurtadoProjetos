@@ -21,7 +21,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const categories = ['Todos', 'UI/UX Design', 'Design Systems', 'Branding', 'E-Commerce', 'Mobile'];
+  const categories = ['Todos', 'UI/UX Design', 'Design Editorial', 'Branding', 'Design Gráfico', 'Mobile', 'Web Design', 'Design de Produto', 'Design de Serviços', 'Design Social', 'Ilustração', 'Design de Conteúdo', 'Motion Design'];
 
   const filteredProjects = selectedCategory === 'Todos'
     ? projects.filter(p => p.status === 'Publicado')
@@ -62,7 +62,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </h1>
 
           <p className="text-lg sm:text-xl text-stone-600 max-w-2xl mx-auto font-sans leading-relaxed font-light">
-            Transformando processos complexos em experiências intuitivas, elegantes e fundamentadas em pesquisa e rigor estético.
+            Transformando problemas e emaranhados em soluções e realidades simples.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
