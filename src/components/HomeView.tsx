@@ -18,14 +18,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onOpenImageLinksModal,
   onContactClick,
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const categories = ['Todos', 'UI/UX Design', 'Design Editorial', 'Branding', 'Design Gráfico', 'Mobile', 'Web Design', 'Design de Produto', 'Design de Serviços', 'Design Social', 'Ilustração', 'Design de Conteúdo', 'Motion Design'];
 
-  const filteredProjects = selectedCategory === 'Todos'
+  const filteredProjects = selectedCategories.length === 0
     ? projects.filter(p => p.status === 'Publicado')
-    : projects.filter(p => p.status === 'Publicado' && (p.category === selectedCategory || p.tags.includes(selectedCategory)));
+    : projects.filter(p => p.status === 'Publicado' && selectedCategories.some(category => p.category === category || p.tags.includes(category)));
+
+  const handleCategoryClick = (category: string) => {
+    if (category === 'Todos') {
+      setSelectedCategories([]);
+      return;
+    }
+
+    setSelectedCategories(current => current.includes(category)
+      ? current.filter(selected => selected !== category)
+      : [...current, category]);
+  };
 
   const handleCopyImageLink = (e: React.MouseEvent, url: string, id: string) => {
     e.stopPropagation();
@@ -89,21 +100,22 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <section id="projetos" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
         {/* Section Header & Categories */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-stone-200/80 pb-8">
+        <div className="flex flex-col gap-6 border-b border-stone-200/80 pb-8">
           <div>
             <div className="text-xs small-caps uppercase tracking-widest text-purple-900 mb-1 font-medium">Portfólio Selecionado</div>
             <h2 className="text-3xl font-serif text-stone-900 font-medium">Projetos & Trabalhos</h2>
           </div>
 
           {/* Category Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+          <div className="flex flex-wrap items-center gap-2">
             <Filter className="w-4 h-4 text-stone-400 shrink-0 mr-1" />
             {categories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => handleCategoryClick(cat)}
+                aria-pressed={cat === 'Todos' ? selectedCategories.length === 0 : selectedCategories.includes(cat)}
                 className={`px-4 py-2 rounded-lg text-xs small-caps tracking-wider whitespace-nowrap transition-all ${
-                  selectedCategory === cat
+                  (cat === 'Todos' ? selectedCategories.length === 0 : selectedCategories.includes(cat))
                     ? 'bg-purple-950 text-white font-bold shadow-md'
                     : 'bg-white/80 text-stone-600 hover:text-purple-950 border border-stone-200/80 hover:bg-purple-50/50'
                 }`}
