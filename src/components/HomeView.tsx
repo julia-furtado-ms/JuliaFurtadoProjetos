@@ -58,7 +58,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
 
           <h1 className="text-4xl sm:text-6xl md:text-7xl font-serif tracking-tight text-stone-900 leading-[1.1]">
-            Crio produtos digitais que <span className="italic font-serif text-purple-900">fazem sentido.</span>
+            Cri<span className="italic font-serif text-purple-900">Ative.</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-stone-600 max-w-2xl mx-auto font-sans leading-relaxed font-light">
